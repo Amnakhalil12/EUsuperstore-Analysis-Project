@@ -1,0 +1,377 @@
+---
+title: "EUsuperstore_Data_Analysis_Project"
+author: "Amna Khalil"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(readr)
+library(ggplot2)
+library(tidyverse)
+library(plotly)
+
+readr::read_csv("C:/Users/Amna Khalil/OneDrive - Higher Education Commission/Documents/Data analyst/Sample - EU Superstore - Orders (1).csv")
+Sample_EU_Superstore_Orders_1_ <- read_csv("C:/Users/Amna Khalil/OneDrive - Higher Education Commission/Documents/Data analyst/Sample - EU Superstore - Orders (1).csv")
+
+View(Sample_EU_Superstore_Orders_1_)
+
+
+# Assuming Sample_EU_Superstore_Orders_1_ is a data frame with a column named Sales
+# Assuming Sample_EU_Superstore_Orders_1_ is a data frame with a column named Sales
+
+# Calculate total sales
+total_sales <- sum(Sample_EU_Superstore_Orders_1_$Sales)
+
+# Print the total sales
+cat("Total Sales for All Orders: $", total_sales, "\n")
+
+
+# Assuming Sample_EU_Superstore_Orders_1_ is a data frame with a column named Customer ID
+
+# Count the number of unique customers
+unique_customers <- length(unique(Sample_EU_Superstore_Orders_1_$`Customer ID`))
+
+# Print the number of unique customers
+cat("Number of Unique Customers: ", unique_customers, "\n")
+
+
+
+	# Assuming Sample_EU_Superstore_Orders_1_ is a data frame with a column named Ship Mode
+	
+	# Create a table of the count of orders for each ship mode
+	orders_by_ship_mode <- table(Sample_EU_Superstore_Orders_1_$`Ship Mode`)
+	
+	# Display the count of orders for each ship mode on the screen
+	cat("Orders by Ship Mode:\n")
+	print(orders_by_ship_mode)
+	
+	# Create a bar plot
+	barplot(orders_by_ship_mode, main = "Orders by Ship Mode", col = "skyblue", ylab = "Number of Orders", xlab = "Ship Mode")
+	
+	
+	                
+# Proportion of orders in each Ship Mode category
+ship_mode_proportion <- Sample_EU_Superstore_Orders_1_ %>%
+  group_by(`Ship Mode`) %>%
+  summarise(order_count = n()) %>%
+  mutate(proportion = order_count / sum(order_count))
+
+	
+# Bar plot for proportion of orders in each Ship Mode category
+	ggplot(ship_mode_proportion, aes(x = `Ship Mode`, y = proportion, fill = `Ship Mode`)) +
+	  geom_bar(stat = "identity") +
+	  labs(title = "Proportion of Orders in Each Ship Mode Category", x = "Ship Mode", y = "Proportion") +
+	  theme_minimal()
+	
+
+	# Box plot for Ship Mode and Profit
+	ggplot(Sample_EU_Superstore_Orders_1_, aes(x = `Ship Mode`, y = Profit, fill = `Ship Mode`)) +
+	  geom_boxplot() +
+	  labs(title = "Correlation between Ship Mode and Profit", x = "Ship Mode", y = "Profit") +
+	  theme_minimal()
+
+
+                               	 
+#Assuming you have the 'sales_data' data frame from the previous example
+	# Assuming your dataset is named 'Sample_EU_Superstore_Orders_1_'
+	str(Sample_EU_Superstore_Orders_1_)
+	head(Sample_EU_Superstore_Orders_1_)
+	colnames(Sample_EU_Superstore_Orders_1_)
+	# Convert 'Order Date' to Date format
+	Sample_EU_Superstore_Orders_1_$Order_Date <- as.Date(Sample_EU_Superstore_Orders_1_$`Order Date`, format = "%m/%d/%Y")
+	# Assuming your dataset has columns 'Order_Date', 'Ship Mode', and 'Sales'
+	Sample_EU_Superstore_Orders_1_ <- Sample_EU_Superstore_Orders_1_[order(Sample_EU_Superstore_Orders_1_$Order_Date), ]
+	
+	# Convert 'Order Date' to Date format
+	Sample_EU_Superstore_Orders_1_$Order_Date <- as.Date(Sample_EU_Superstore_Orders_1_$`Order Date`, format = "%m/%d/%Y")
+	
+	# Assuming your dataset has columns 'Order_Date', 'Ship_Mode', and 'Sales'
+	Sample_EU_Superstore_Orders_1_ <- Sample_EU_Superstore_Orders_1_[order(Sample_EU_Superstore_Orders_1_$Order_Date), ]
+	
+	# Calculate rolling 30-day sales by ship mode
+	Sample_EU_Superstore_Orders_1_$Rolling_Sales <- ave(
+	  Sample_EU_Superstore_Orders_1_$Sales,
+	  Sample_EU_Superstore_Orders_1_$`Ship Mode`,
+	  FUN = function(x) zoo::rollapply(x, width = 30, sum, fill = NA, align = "right")
+	)
+	
+	# Plot the rolling 30-day sales by ship mode, ignoring missing values
+	ggplot(Sample_EU_Superstore_Orders_1_, aes(x = Order_Date, y = Rolling_Sales, color = `Ship Mode`)) +
+	  geom_line(na.rm = TRUE) +
+	  labs(
+	    title = "Rolling 30-Day Sales by Ship Mode",
+	    x = "Order Date",
+	    y = "Rolling Sales (in dollars)"
+	  ) +
+	  theme_minimal()
+	
+
+	
+
+
+	                                    
+
+	# Assuming Sample_EU_Superstore_Orders_1_ is a data frame with columns 'Order Date', 'Region', 'Country', and 'Sales'
+	# Convert 'Order Date' to Date format
+	Sample_EU_Superstore_Orders_1_$Order_Date <- as.Date(Sample_EU_Superstore_Orders_1_$`Order Date`, format = "%m/%d/%Y")
+	
+	# Create a box plot for each region, with countries within each region
+	ggplot(Sample_EU_Superstore_Orders_1_, aes(x = Region, y = Sales, fill = Country)) +
+	  geom_boxplot() +
+	  labs(title = "Order Value by Region and Country", x = "Region", y = "Order Value", fill = "Country") +
+	  theme_minimal()
+	
+	
+                                  
+knitr::opts_chunk$set(echo = TRUE)
+
+# Assuming Sample_EU_Superstore_Orders_1 is a data frame with columns 'Order Date', 'Region', and 'Sales'
+# Convert 'Order Date' to Date format
+Sample_EU_Superstore_Orders_1_$Order_Date <- as.Date(Sample_EU_Superstore_Orders_1_$`Order Date`, format = "%m/%d/%Y")
+
+# Create side-by-side box plots for each region
+ggplot(Sample_EU_Superstore_Orders_1_, aes(x = Region, y = Sales, fill = Region)) +
+  geom_boxplot() +
+  labs(title = "Distribution of Order Value by Region", x = "Region", y = "Order Value") +
+  theme_minimal()
+
+
+                          
+# Create a bar plot of sales by region
+ggplot(Sample_EU_Superstore_Orders_1_, aes(x = Region, y = Sales, fill = Region)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Distribution of Sales Across Different Regions", x = "Region", y = "Total Sales") +
+  theme_minimal()
+
+                                      
+# Assuming Sample_EU_Superstore_Orders_1_ is a data frame with columns 'City' and 'Sales'
+# Aggregate sales data by city
+sales_by_city <- aggregate(Sales ~ City, data = Sample_EU_Superstore_Orders_1_, sum)
+
+# Identify top cities (adjust 'n' based on your preference)
+top_cities <- head(sales_by_city[order(sales_by_city$Sales, decreasing = TRUE), ], n = 10)
+
+# Create a bar plot for sales by top cities
+ggplot(top_cities, aes(x = reorder(City, -Sales), y = Sales, fill = City)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Sales by Top Cities", x = "City", y = "Sales") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+
+
+plotly::ggplotly(
+  Sample_EU_Superstore_Orders_1_ %>%
+    group_by(Country) %>%
+    summarise(order_total = sum(Sales)) %>%
+    ggplot(aes(x = Country, y = order_total, fill = Country)) +
+    geom_col() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+)
+
+
+
+plotly::ggplotly(
+  df_summary <- Sample_EU_Superstore_Orders_1_ %>%
+    group_by(City, Country) %>%
+    summarise(City_orders = n(), .groups = 'drop') %>%
+    ungroup() %>%
+    group_by(Country) %>%
+    mutate(
+      country_orders = sum(City_orders),
+      order_proportion = round(City_orders / country_orders, 4)
+    ) %>%
+    ggplot(aes(x = Country, y = order_proportion, fill = City)) +
+    geom_bar(stat = "identity") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+)
+
+
+plotly::ggplotly(
+  df_summary <- Sample_EU_Superstore_Orders_1_ %>%
+    group_by(City, Country) %>%
+    summarise(City_orders = n(), .groups = 'drop') %>%
+    ungroup() %>%
+    group_by(Country) %>%
+    mutate(
+      country_orders = sum(City_orders),
+      order_proportion = round(City_orders / country_orders, 4)
+    ) %>%
+    select(City, Country, City_orders, order_proportion) %>%
+    ggplot(aes(x = Country, y = City_orders, fill = order_proportion)) +
+    geom_bar(stat = "identity", position = "stack") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+)
+
+                     
+# Create a bar plot of sales by sub-category
+ggplot(Sample_EU_Superstore_Orders_1_, aes(x = `Sub-Category`, fill = `Sub-Category`)) +
+  geom_bar() +
+  labs(title = "Distribution of Sales by Sub-Category",
+       x = "Sub-Category",
+       y = "Total Sales") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better readability
+
+# Sort the dataset by Sales in descending order
+sales_data_sorted <- Sample_EU_Superstore_Orders_1_[order(-Sample_EU_Superstore_Orders_1_$Sales), ]
+
+# Select the top 5 countries
+top_countries <- head(sales_data_sorted, 5)
+
+# Create bar plots for top 5 countries
+library(ggplot2)
+ggplot(top_countries, aes(x = reorder(Country, -Sales), y = Sales, fill = Country)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Top 5 Countries by Sales", x = "Country", y = "Sales") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+                       
+# Assuming you have the 'Sample_EU_Superstore_Orders_1_' data frame
+# Convert 'Order Date' to Date format
+Sample_EU_Superstore_Orders_1_$Order_Date <- as.Date(Sample_EU_Superstore_Orders_1_$`Order Date`, format = "%m/%d/%Y")
+
+# Create a new variable for the quarter
+Sample_EU_Superstore_Orders_1_$Quarter <- quarters(Sample_EU_Superstore_Orders_1_$Order_Date)
+
+# Create a stacked barplot
+
+ggplot(Sample_EU_Superstore_Orders_1_, aes(x = Quarter, y = Sales, fill = Category)) +
+  geom_bar(stat = "sum") +
+  labs(
+    title = "Quarterly Sales by Category",
+    x = "Quarter",
+    y = "Sales (in dollars)",
+    fill = "Category"
+  ) +
+  theme_minimal()
+
+
+
+
+
+# Find the product category with the highest sales
+# Sum the sales for each product category
+sales_by_category <- aggregate(Sales ~ Category, data = Sample_EU_Superstore_Orders_1_, sum)
+
+# Find the product category with the highest sales
+max_sales_category <- sales_by_category[which.max(sales_by_category$Sales), "Category"]
+
+# Display the product category with the highest sales on the screen
+cat("Product Category with the Highest Sales: ", max_sales_category, "\n")
+# Create a bar plot
+barplot(sales_by_category$Sales, names.arg = sales_by_category$Category, main = "Sales by Product Category", xlab = "Product Category", ylab = "Sales ($)", col = "purple", border = "black")
+
+
+
+	
+	
+library(ggplot2)
+
+# Assuming Sample_EU_Superstore_Orders_1_ is your data frame
+Sample_EU_Superstore_Orders_1_$`Order Date` <- as.Date(Sample_EU_Superstore_Orders_1_$`Order Date`, format = "%m/%d/%Y")
+
+# Arrange data by Date within each category
+Sample_EU_Superstore_Orders_1_ <- Sample_EU_Superstore_Orders_1_ %>%
+  arrange(Category, `Order Date`)
+
+# Calculate rolling past 30 days sales for each category
+Sample_EU_Superstore_Orders_1_ <- Sample_EU_Superstore_Orders_1_ %>%
+  group_by(Category) %>%
+  mutate(rolling_sales_30d = zoo::rollapplyr(Sales, width = 30, FUN = sum, align = "right", fill = NA))
+
+# Plot the result
+ggplot(Sample_EU_Superstore_Orders_1_, aes(x = `Order Date`, y = rolling_sales_30d, color = Category)) +
+  geom_line() +
+  labs(title = "Rolling 30 Days Sales Trend by Category", x = "Order Date", y = "Rolling Sales (30 Days)", color = "Category") +
+  theme_minimal()
+
+
+                              
+# Extract quarter from the Order Date
+Sample_EU_Superstore_Orders_1_$Quarter <- quarters(Sample_EU_Superstore_Orders_1_$Order_Date)
+
+# Line plot for sales variation over different quarters
+ggplot(Sample_EU_Superstore_Orders_1_, aes(x = Quarter, y = Sales, group = 1)) +
+  geom_line() +
+  labs(title = "Sales Variation Over Different Quarters", x = "Quarter", y = "Sales") +
+  theme_minimal()
+
+
+# Assuming Sample_EU_Superstore_Orders_1_ is a data frame with columns 'Order Date', 'State', and 'Sales'
+
+# Convert 'Order Date' to Date format
+Sample_EU_Superstore_Orders_1_$Order_Date <- as.Date(Sample_EU_Superstore_Orders_1_$`Order Date`, format = "%m/%d/%Y")
+
+# Extract year and quarter from Order Date
+Sample_EU_Superstore_Orders_1_$Year <- format(Sample_EU_Superstore_Orders_1_$Order_Date, "%Y")
+Sample_EU_Superstore_Orders_1_$Quarter <- quarters(Sample_EU_Superstore_Orders_1_$Order_Date)
+
+# Create a stacked barplot for each quarter
+
+ggplot(Sample_EU_Superstore_Orders_1_, aes(x = Year, y = Sales, fill = Quarter)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Stacked Barplot by Quarter", x = "Year", y = "Sales", fill = "Quarter") +
+  theme_minimal()
+
+
+                             
+
+
+# Assuming Sample_EU_Superstore_Orders_1_ is a data frame with columns 'Customer ID', 'Product ID', and 'Sales'
+# Identify top 5 customers and products
+top_customers <- head(aggregate(Sales ~ `Customer ID`, data = Sample_EU_Superstore_Orders_1_, sum), 5)
+top_products <- head(aggregate(Sales ~ `Product ID`, data = Sample_EU_Superstore_Orders_1_, sum), 5)
+
+# Create bar plots for top 5 customers and products
+ggplot(top_customers, aes(x = reorder(`Customer ID`, -Sales), y = Sales, fill = `Customer ID`)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Top 5 Customers", x = "Customer ID", y = "Sales") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Create bar plots for top 5 customers and products
+ggplot(top_products, aes(x = reorder(`Product ID`, -Sales), y = Sales, fill = `Product ID`)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Top 5 Products", x = "Product ID", y = "Sales") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+
+
+
+# Calculate the correlation between discount and profit margin
+correlation_discount_profit <- cor(Sample_EU_Superstore_Orders_1_$Discount, Sample_EU_Superstore_Orders_1_$Profit)
+
+# Display the correlation on the screen
+cat("Correlation between Discount and Profit Margin: ", correlation_discount_profit, "\n")
+
+
+
+
+
+                          
+
+
+
+
+
+```
